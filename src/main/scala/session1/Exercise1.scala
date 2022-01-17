@@ -2,28 +2,18 @@ package session1
 
 import zio._
 
-import java.io.IOException
-import java.time.LocalDateTime
+import java.time.LocalDate
 
-// TODO
 object Exercise1 extends scala.App {
 
-  val timeEffect: ZIO[Clock, Nothing, LocalDateTime] = Clock.localDateTime
-
-  def parseEffect(s: String): ZIO[Any, Throwable, LocalDateTime] =
-    ZIO.attempt(LocalDateTime.parse(s))
-
-  def rndEffect(time: LocalDateTime): ZIO[Random with Console, IOException, Int] =
+  val program: ZIO[ZEnv, Throwable, Unit] =
     for {
-      i <- Random.nextInt
-    } yield time.plusDays(i)
-
-  val program: ZIO[ZEnv, Exception, Unit] =
-    for {
-      _       <- Console.print("Date: ")
-      dateStr <- Console.readLine
-      date    <- parseEffect(dateStr)
-      _       <- Console.printLine(date)
+      _         <- Console.print("Date: ")
+      dateStr   <- Console.readLine
+      date      <- ZIO.attempt(LocalDate.parse(dateStr))
+      daysToAdd <- Random.nextLongBounded(90).tap(n => Console.printLine(s"Adding $n days"))
+      transformed = date.plusDays(daysToAdd)
+      _ <- Console.printLine(transformed)
     } yield ()
 
   val runtime = Runtime.default
