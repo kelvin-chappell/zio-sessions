@@ -4,6 +4,11 @@ import zio._
 
 import scala.annotation.tailrec
 
+/*
+ * Write a ZIO program that will in parallel calculate the sum of numbers
+ * up to a given Int value and the highest prime number below a given Int value
+ * and then sum the result.
+ */
 object Exercise4 extends ZIOAppDefault {
 
   def calcSumUpTo(n: Int): Long = if (n < 0) throw new RuntimeException("too low") else (1 to n).sum
@@ -17,9 +22,9 @@ object Exercise4 extends ZIOAppDefault {
   }
 
   val program: ZIO[Console, Throwable, Unit] = for {
-    (n, m) <- ZIO.attempt(highestPrimeBelow(1)).zipPar(ZIO.attempt(calcSumUpTo(-1)))
-    _      <- Console.printLine(n)
-    _      <- Console.printLine(m)
+    (p, s) <- ZIO.attempt(highestPrimeBelow(1)).zipPar(ZIO.attempt(calcSumUpTo(-1)))
+    _      <- Console.printLine(p)
+    _      <- Console.printLine(s)
   } yield ()
 
   val run: ZIO[ZEnv with ZIOAppArgs, Any, Any] = program.foldZIO(

@@ -4,6 +4,10 @@ import zio._
 
 import java.time.LocalDate
 
+/*
+ * Write a ZIO program that reads a date string from the console,
+ * adds a random number of days to it and prints the result to the console.
+ */
 object Exercise1 extends scala.App {
 
   val program: ZIO[ZEnv, Throwable, Unit] =
@@ -17,10 +21,5 @@ object Exercise1 extends scala.App {
 
   val runtime = Runtime.default
 
-  runtime.unsafeRun(
-    program.foldZIO(
-      failure => Console.printLine(s"Failed: $failure"),
-      success => Console.printLine(s"Success: $success")
-    )
-  )
+  runtime.unsafeRun(program)
 }

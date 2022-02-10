@@ -4,6 +4,9 @@ import zio._
 
 import java.time.LocalDate
 
+/*
+ * If the date entered is invalid, use the current date instead.
+ */
 object Exercise2 extends ZIOAppDefault {
 
   def toDate(dateStr: String): ZIO[Clock, Nothing, LocalDate] =
