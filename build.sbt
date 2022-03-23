@@ -1,9 +1,10 @@
-import Dependencies._
-
-ThisBuild / scalaVersion := "2.13.7"
+ThisBuild / scalaVersion := "2.13.8"
 
 lazy val root = (project in file("."))
   .settings(
     name := "zio-sessions",
-    libraryDependencies += zio
+    libraryDependencies ++= Seq(
+      "dev.zio" %% "zio"                        % "2.0.0-RC3",
+      "com.gu"  %% "content-api-client-default" % "17.25.0"
+    )
   )
