@@ -14,16 +14,18 @@ object Capi {
   def search(q: String): ZIO[Capi, Throwable, List[Content]] = ZIO.serviceWithZIO(_.search(q))
 }
 
-case class CapiLive(apiKey: String) extends Capi {
-  override def search(q: String): ZIO[Any, Throwable, List[Content]] = ZIO.fromFuture[List[Content]] { _ =>
-    val client      = new GuardianContentClient(apiKey)
-    val toastSearch = ContentApiClient.search.q("cheese on toast")
-    val x           = client.getResponse(toastSearch).map(_.results.toList)
-    x
-  }
-}
-
 object CapiLive {
-  def layer(apiKey: String): ULayer[Capi] =
-    (() => CapiLive(apiKey)).toLayer[Capi]
+
+  val layer: ZLayer[System, Throwable, Capi] = ZLayer.fromZIO {
+    for {
+      optApiKey <- zio.System.env("API_KEY")
+      apiKey    <- ZIO.fromOption(optApiKey).orElseFail(new IllegalArgumentException("No API key in environment"))
+      client = new GuardianContentClient(apiKey)
+    } yield new Capi {
+      override def search(q: String): ZIO[Any, Throwable, List[Content]] = ZIO.fromFuture { _ =>
+        val search = ContentApiClient.search.q(q)
+        client.getResponse(search).map(_.results.toList)
+      }
+    }
+  }
 }

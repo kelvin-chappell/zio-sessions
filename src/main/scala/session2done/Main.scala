@@ -4,10 +4,12 @@ import zio._
 
 object Main extends ZIOAppDefault {
 
-  val program = for {
-    result <- Capi.search("term")
-    _      <- Console.printLine(result)
+  private val program = for {
+    _       <- Console.print("\nQuery: ")
+    q       <- Console.readLine
+    results <- Capi.search(q)
+    _       <- ZIO.foreachDiscard(results)(result => Console.printLine(result.webTitle))
   } yield ()
 
-  override def run = program.provideCustom(CapiLive.layer("key"))
+  override def run: ZIO[ZEnv, Throwable, Unit] = program.provideCustom(CapiLive.layer).forever
 }
